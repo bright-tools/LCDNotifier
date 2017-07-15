@@ -21,8 +21,7 @@ namespace ReminderNotifier
             {
                 Outlook.AppointmentItem reminderAppt;
                 reminderAppt = (Outlook.AppointmentItem)item;
-                ReminderInterface.SendMessage(reminderAppt.Subject, reminderAppt.Location);
-                //reminderAppt.Start);
+                ReminderInterface.SendMessage(reminderAppt.Subject, reminderAppt.Start.ToString("HH:mm") + " " + reminderAppt.Location);
             }
         }
 

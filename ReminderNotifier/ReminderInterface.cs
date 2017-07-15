@@ -46,11 +46,24 @@ public class ReminderInterface
         }
         else
         {
-            byte[] header = { 0, 1 };
-            byte[] message = Encoding.ASCII.GetBytes("AHello".PadRight(40, '0'));
+            byte[] header = { 0, 0 };
+            byte[] header2 = { 0, 1 };
+
+            byte[] message = PackString(line1);
 
             device.WriteReport(new HidReport(ReportLength, new HidDeviceData(header.Concat(message).ToArray(), HidDeviceData.ReadStatus.Success)));
+
+            message = PackString(line2);
+
+            device.WriteReport(new HidReport(ReportLength, new HidDeviceData(header2.Concat(message).ToArray(), HidDeviceData.ReadStatus.Success)));
         }
+    }
+
+    private static byte[] PackString(string str1)
+    {
+        byte[] message = Encoding.ASCII.GetBytes(str1.PadRight(40, (char)0));
+
+        return message;
     }
 
     private static void ReadReportCallback(HidReport report)
