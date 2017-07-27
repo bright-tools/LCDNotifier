@@ -50,3 +50,14 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# VS files
+ReminderNotifier/bin
+ReminderNotifier/obj
+UpgradeLog.htm
+packages
+.vs/
+
+# Temp files
+.*~
+.*.swp
