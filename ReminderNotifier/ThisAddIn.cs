@@ -10,18 +10,91 @@ namespace ReminderNotifier
 {
     public partial class ThisAddIn
     {
+        private Dictionary<string, uint> reminderLookup = new Dictionary<string, uint>();
+        uint latestReminderNo = 0;
+
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
             this.Application.Reminder += new Outlook.ApplicationEvents_11_ReminderEventHandler(ThisApplication_Reminder);
+            this.Application.Reminders.ReminderRemove += new Outlook.ReminderCollectionEvents_ReminderRemoveEventHandler( ThisApplication_ReminderRemoved );
+            this.Application.OptionsPagesAdd += new Outlook.ApplicationEvents_11_OptionsPagesAddEventHandler(Application_OptionsPagesAdd);
+        }
+
+        private List<string> GetAllAppointmentIDs()
+        {
+            List<string> idList = new List<string>();
+
+            foreach (Outlook.Reminder reminderObj in this.Application.Reminders)
+            {
+                object parent = reminderObj.Parent;
+
+                if (parent is Outlook.AppointmentItem)
+                {
+                    Outlook.AppointmentItem reminderAppt = (Outlook.AppointmentItem)parent;
+
+                    idList.Add(reminderAppt.GlobalAppointmentID);
+                }
+            }
+
+            return idList;
+        }
+
+        void Application_OptionsPagesAdd(Outlook.PropertyPages Pages)
+        {
+            Pages.Add(new OptionsControl(), "");
+        }
+
+        void ThisApplication_ReminderRemoved()
+        {
+            // List of all of the appointment IDs in Outlook
+            List<string> idList = GetAllAppointmentIDs();
+
+            bool cont = true;
+
+            while (cont)
+            {
+                cont = false;
+                // Loop all the appointment IDs currently sent to the display
+                foreach (string id in reminderLookup.Keys)
+                {
+                    if (!idList.Contains(id))
+                    {
+                        removeReminder(id);
+                        cont = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void removeReminder(string id )
+        {
+            // TODO: Send notification to remove
+            ReminderInterface.RemoveMessage(reminderLookup[id]);
+
+            reminderLookup.Remove(id);
         }
 
         void ThisApplication_Reminder(object item)
         {
             if (item is Outlook.AppointmentItem)
             {
-                Outlook.AppointmentItem reminderAppt;
-                reminderAppt = (Outlook.AppointmentItem)item;
-                ReminderInterface.SendMessage(reminderAppt.Subject, reminderAppt.Start.ToString("HH:mm") + " " + reminderAppt.Location);
+                Outlook.AppointmentItem reminderAppt = (Outlook.AppointmentItem)item;
+                uint reminderNo;
+
+                if (reminderLookup.Keys.Contains(reminderAppt.GlobalAppointmentID))
+                {
+                    reminderNo = reminderLookup[reminderAppt.GlobalAppointmentID];
+                }
+                else
+                {
+                    reminderLookup[reminderAppt.GlobalAppointmentID] = latestReminderNo;
+                    reminderNo = latestReminderNo;
+
+                    latestReminderNo++;
+                }
+
+                ReminderInterface.SendMessage(reminderNo, reminderAppt.Subject, reminderAppt.Start.ToString("HH:mm") + " " + reminderAppt.Location);
             }
         }
 
