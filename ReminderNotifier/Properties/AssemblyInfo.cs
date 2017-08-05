@@ -9,16 +9,16 @@ using System.Security;
 [assembly: AssemblyTitle("ReminderNotifier")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Ricardo UK Ltd")]
+[assembly: AssemblyCompany("Bright Silence Ltd")]
 [assembly: AssemblyProduct("ReminderNotifier")]
-[assembly: AssemblyCopyright("Copyright © Ricardo UK Ltd 2017")]
+[assembly: AssemblyCopyright("Copyright © Bright Silence Ltd 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+[assembly: ComVisible(true)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("30446a48-1a3d-4d25-8efc-7868f5f0b136")]

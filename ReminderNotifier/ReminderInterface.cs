@@ -68,6 +68,8 @@ public class ReminderInterface
             //  to match previous messages.
             byte[] message = header.Concat(BitConverter.GetBytes(id)).ToArray();
 
+            Array.Resize(ref message, ReportLength);
+
             if (device.WriteReport(new HidReport(ReportLength, new HidDeviceData(message, HidDeviceData.ReadStatus.Success))))
             {
                 retVal = true;
