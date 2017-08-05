@@ -10,13 +10,17 @@ namespace ReminderNotifier
 {
     public partial class ThisAddIn
     {
+        private Outlook.Reminders m_reminders;
         private Dictionary<string, uint> reminderLookup = new Dictionary<string, uint>();
         uint latestReminderNo = 0;
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
             this.Application.Reminder += new Outlook.ApplicationEvents_11_ReminderEventHandler(ThisApplication_Reminder);
-            this.Application.Reminders.ReminderRemove += new Outlook.ReminderCollectionEvents_ReminderRemoveEventHandler( ThisApplication_ReminderRemoved );
+
+            m_reminders = this.Application.Reminders;
+
+            m_reminders.ReminderRemove += new Outlook.ReminderCollectionEvents_ReminderRemoveEventHandler( ThisApplication_ReminderRemoved );
             this.Application.OptionsPagesAdd += new Outlook.ApplicationEvents_11_OptionsPagesAddEventHandler(Application_OptionsPagesAdd);
         }
 
@@ -44,7 +48,7 @@ namespace ReminderNotifier
             Pages.Add(new OptionsControl(), "");
         }
 
-        void ThisApplication_ReminderRemoved()
+        private void ThisApplication_ReminderRemoved()
         {
             // List of all of the appointment IDs in Outlook
             List<string> idList = GetAllAppointmentIDs();
@@ -82,6 +86,7 @@ namespace ReminderNotifier
                 Outlook.AppointmentItem reminderAppt = (Outlook.AppointmentItem)item;
                 uint reminderNo;
 
+                /* Already in our list? */
                 if (reminderLookup.Keys.Contains(reminderAppt.GlobalAppointmentID))
                 {
                     reminderNo = reminderLookup[reminderAppt.GlobalAppointmentID];
